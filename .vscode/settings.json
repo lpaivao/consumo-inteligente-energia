@@ -1,0 +1,21 @@
+{
+    "cSpell.words": [
+        "calcsize",
+        "DGRAM",
+        "endereco",
+        "indice",
+        "interrupcao",
+        "maximo",
+        "mday",
+        "padrao",
+        "PADRAO",
+        "parametros",
+        "requestline",
+        "Requisicao",
+        "usuario",
+        "Usuario",
+        "Variaveis"
+    ],
+    "python.formatting.provider": "black",
+    "python.analysis.typeCheckingMode": "off"
+}
