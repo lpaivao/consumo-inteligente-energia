@@ -1,32 +1,9 @@
-# ------------------------------------- HTTP Request example -------------------------------------
-# GET /hello.txt HTTP/1.1
-# User-Agent     : curl/7.64.1
-# Host           : www.example.com
-# Accept-Language: en, mi
-
-##------------------------------------- HTTP Response example -------------------------------------
-# HTTP/1.1 200 OK
-# Date          : Mon, 27 Jul 2009 12: 28: 53 GMT
-# Server        : Apache
-# Last-Modified : Wed, 22 Jul 2009 19: 15: 56 GMT
-# ETag          : "34aa387-d-1568eb00"
-# Accept-Ranges : bytes
-# Content-Length: 51
-# Vary          : Accept-Encoding
-# Content-Type  : text/plain
-# Hello World! My content includes a trailing CRLF.
 import json
 import urllib.parse
 import urllib.request
 
-import socket
-import select
-import threading
-
-from ServerHttp import RequestHandler as rh
-from Usuario import Usuario
-from utils.HttpUtils import *
-
+from src.utils.HttpUtils import *
+import src.entities.Usuario as user
 
 def splitHttpReq(http_request):
     # exemplo de string de requisição HTTP
@@ -55,8 +32,6 @@ def splitHttpReq(http_request):
 
 
 def splitHttpResp(http_response):
-    # exemplo de string de resposta HTTP
-    # http_response = 'HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: 17\r\n\r\n{"status": "ok"}'
 
     # dividir a string em duas partes
     response_parts = http_response.split("\r\n\r\n")
@@ -80,7 +55,7 @@ def splitHttpResp(http_response):
 
 
 def receiveGet(
-    request_method, request_path, request_protocol, headers, conn, addr, lista_usuarios
+     request_path, conn, lista_usuarios
 ):
     if "/usuario/?" in request_path:
         parametros_de_consulta = urllib.parse.parse_qs(
@@ -93,12 +68,12 @@ def receiveGet(
             body_response = {"Mensagem": "Id nao encontrado"}
             body_response = json.dumps(body_response)
             conn.sendall(NotFound(body_response))
-
+            ##########################################
         else:
-            dados = lista_usuarios[id].__dict__
-            body = json.dumps(dados)
+            #dados = lista_usuarios[id].__dict__
+            #body = json.dumps(dados)
+            body = lista_usuarios[id].toJson()
             response = OK(body)
-
             conn.sendall(response)
 
     elif "/usuario/fatura/" in request_path:
@@ -107,7 +82,7 @@ def receiveGet(
             urllib.parse.urlparse(request_path).query
         )
         # Obtendo o valor do Query Param 'id'
-        id = parametros_de_consulta["id"][0]
+        id = int(parametros_de_consulta["id"][0])
         mes = parametros_de_consulta["mes"][0]
         if id not in lista_usuarios.keys():
             body_response = {"Mensagem": "Id nao encontrado"}
@@ -144,13 +119,9 @@ def receiveGet(
 
 
 def receivePost(
-    request_method,
     request_path,
-    request_protocol,
-    headers,
     body,
     conn,
-    addr,
     lista_usuarios,
 ):
     if request_path == "/usuario/cadastro/":
@@ -161,7 +132,7 @@ def receivePost(
         nome = data["nome"]
         endereco = data["endereco"]
 
-        usuario = Usuario(id, nome, endereco)
+        usuario = user.Usuario(id, nome, endereco)
         lista_usuarios[id] = usuario
         # ...
 
@@ -173,7 +144,7 @@ def receivePost(
 
 
 def receiveDelete(
-    request_method, request_path, request_protocol, headers, conn, addr, lista_usuarios
+     request_path, conn, lista_usuarios
 ):
     if "/usuario/delete/?" in request_path:
         print("entrou")
@@ -198,26 +169,6 @@ def receiveDelete(
 
 
 # Protocolos de resposta sem body
-def OK():
-    return "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n".encode()
-
-
-def BadRequest():
-    return "HTTP/1.1 400 Bad Request\r\n\r\n".encode()
-
-
-def NotFound():
-    return "HTTP/1.1 404 Not Found\r\n\r\n".encode()
-
-
-def InternalServerError():
-    return "HTTP/1.1 500 Internal Server Error\r\n\r\n".encode()
-
-
-def Created():
-    return "HTTP/1.1 201 Created\r\n\r\n".encode()
-
-
 # Protocolos de resposta com body em JSON
 def OK(body):
     return "HTTP/1.1 200 OK\r\n\r\n{}".format(body).encode()

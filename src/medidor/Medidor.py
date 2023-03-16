@@ -7,7 +7,7 @@ import hashlib
 import time
 import threading
 
-import utils.Constantes as const
+from src.utils import Constantes as const
 
 consumo_padrao_mensal = 150  # KwH
 consumo_maior_mensal = 310
@@ -18,8 +18,6 @@ consumo_maior_segundos = 0.1
 consumo_menor_segundos = 0.03
 
 consumo_inicial = consumo_padrao_segundos
-
-acumulador = 0
 
 # Define a estrutura do pacote UDP
 PACKET_FORMAT = "Iqf"
@@ -58,6 +56,7 @@ def parse_packet(data):
 class SocketThread(threading.Thread):
     def __init__(self, sock, stop_event, client_id):
         super().__init__()
+        self.acumulador = 0
         self.sock = sock
         self.stop_event = stop_event
         self.client_id = client_id
@@ -78,11 +77,12 @@ class SocketThread(threading.Thread):
                 date = dt.strftime("%Y-%m-%d")  # formato YYYY-MM-DD
                 data_split = date.split("-")
                 if data_split[2] == "10":
-                    acumulador = 0
-                acumulador = acumulador + consumo  # Empacota os dados
-                packet = create_packet(self.client_id, timestamp, acumulador)
+                    self.acumulador = 0
+                self.acumulador = self.acumulador + consumo  # Empacota os dados
+                packet = create_packet(self.client_id, timestamp, self.acumulador)
                 # Faz o parse do desempacotamento
                 parsed_data = parse_packet(packet)
+                print(parsed_data)
                 # assert parsed_data == (self.client_id, timestamp, consumo)
                 self.sock.sendto(packet, (const.HOST, const.UDP_PORT))
                 time.sleep(3)
@@ -92,7 +92,8 @@ class SocketThread(threading.Thread):
 
 
 def main():
-    client_id = int(input("Digite o ID do cliente que será associado ao medidor:\n"))
+    client_id = int(
+        input("Digite o ID do cliente que será associado ao medidor:\n"))
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     stop_event = threading.Event()

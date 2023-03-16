@@ -1,5 +1,4 @@
 import json
-import FaturaEnergia
 
 
 class Usuario:
@@ -7,8 +6,8 @@ class Usuario:
         self.id = id
         self.nome = nome
         self.endereco = endereco
-        self.consumo = ()
-        self.fatura = {"01": 1.0, "02": 2.0, "03": 3.0}
+        self.consumo = []
+        self.fatura = {"1": 1.0, "2": 2.0, "3": 3.0}
         self.alerta_consumo_excessivo = False
         self.alerta_grande_variacao = False
 
@@ -17,8 +16,8 @@ class Usuario:
             "id": self.id,
             "nome": self.nome,
             "endereco": self.endereco,
-            "consumo": self.consumo,
-            "fatura": self.fatura,
+            "consumo_excessivo": self.alerta_consumo_excessivo,
+            "grande_variacao": self.alerta_grande_variacao
         }
         x = json.dumps(x)
         return x
