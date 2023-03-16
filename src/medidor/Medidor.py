@@ -78,7 +78,7 @@ class SocketThread(threading.Thread):
                 date = dt.strftime("%Y-%m-%d")  # formato YYYY-MM-DD
                 hora = dt.strftime("%H:%M:%S")  # formato HH:MM:SS
 
-                if fct.verifica_fechamento_fatura(date, time):
+                if fct.verifica_fechamento_fatura(date, hora):
                     self.acumulador = 0
                     time.sleep(54)
                 else:
