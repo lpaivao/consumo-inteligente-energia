@@ -188,26 +188,19 @@ def udp_listener():
                 date = dt.strftime("%Y-%m-%d")  # formato YYYY-MM-DD
                 time = dt.strftime("%H:%M:%S")  # formato HH:MM:SS
 
-                # Pega o dia e o mes separados
+                # Pega o mes
                 date_format = date.split("-")
-                dia = date_format[2]
                 mes = date_format[1]
-
                 # Faz a tupla para adicionar a lista de consumo do cliente
                 tupla_consumo = (date, time, consumo)
                 usuario = lista[client_id]
                 usuario.consumo.append(tupla_consumo)
 
-                if dia == const.DIA_FECHAMENTO:
-                    fecha_fatura(usuario, consumo, mes)
+                if fct.verifica_fechamento_fatura(date, time):
+                    fct.fecha_fatura(usuario, consumo, mes)
 
     except KeyboardInterrupt:
         pass
-
-
-def fecha_fatura(usuario, consumo, mes):
-    valor_fatura = consumo * const.TARIFA_ENERGIA
-    usuario.fatura[mes] = {"consumo": consumo, "valor": valor_fatura}
 
 
 def handle_client(cliente, addr, evento):
@@ -282,8 +275,8 @@ if __name__ == "__main__":
     lista[1] = usuario1
     lista[2] = usuario2
 
-    #servidor = ServidorTCP(const.HOST, const.TCP_PORT, 5)
-    #servidor.inicia()
+    # servidor = ServidorTCP(const.HOST, const.TCP_PORT, 5)
+    # servidor.inicia()
 
     tcp_thread = threading.Thread(target=tcp_listener)
     tcp_thread.start()

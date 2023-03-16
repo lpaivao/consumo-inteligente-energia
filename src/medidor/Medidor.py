@@ -8,6 +8,7 @@ import time
 import threading
 
 from src.utils import Constantes as const
+import src.utils.Funcoes as fct
 
 consumo_padrao_mensal = 150  # KwH
 consumo_maior_mensal = 310
@@ -75,17 +76,21 @@ class SocketThread(threading.Thread):
                 dt = datetime.datetime.fromtimestamp(timestamp)
                 # Obtendo a data e o horário separadamente
                 date = dt.strftime("%Y-%m-%d")  # formato YYYY-MM-DD
-                data_split = date.split("-")
-                if data_split[2] == "10":
+                hora = dt.strftime("%H:%M:%S")  # formato HH:MM:SS
+
+                if fct.verifica_fechamento_fatura(date, time):
                     self.acumulador = 0
-                self.acumulador = self.acumulador + consumo  # Empacota os dados
-                packet = create_packet(self.client_id, timestamp, self.acumulador)
-                # Faz o parse do desempacotamento
-                parsed_data = parse_packet(packet)
-                print(parsed_data)
-                # assert parsed_data == (self.client_id, timestamp, consumo)
-                self.sock.sendto(packet, (const.HOST, const.UDP_PORT))
-                time.sleep(3)
+                    time.sleep(54)
+                else:
+                    self.acumulador = self.acumulador + consumo  # Empacota os dados
+                    packet = create_packet(self.client_id, timestamp, self.acumulador)
+                    # Faz o parse do desempacotamento
+                    parsed_data = parse_packet(packet)
+                    print(parsed_data)
+                    # assert parsed_data == (self.client_id, timestamp, consumo)
+                    self.sock.sendto(packet, (const.HOST, const.UDP_PORT))
+                    time.sleep(5)
+
             except KeyboardInterrupt:
                 self.stop_event.set()
                 self.sock.close()

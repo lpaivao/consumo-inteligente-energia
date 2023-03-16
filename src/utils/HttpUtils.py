@@ -117,6 +117,39 @@ def receiveGet(
 
         conn.sendall(response)
 
+    elif "/usuario/alerta/variacao/?" in request_path:
+        # Analisando a URL da solicitação para obter os parâmetros de consulta
+        parametros_de_consulta = urllib.parse.parse_qs(
+            urllib.parse.urlparse(request_path).query
+        )
+        # Obtendo o valor do Query Param 'id'
+        id = parametros_de_consulta.get("id", None)
+        print("consultar alerta de usuario de id: " + id[0])
+        usuario = lista_usuarios[int(id[0])]
+
+        if(usuario.alerta_grande_variacao == True):
+            response = OK({"Alerta!!": "Sua Ultima fatura possui grande variacao"})
+        else:
+            response = OK({"Sem alertas": "Sua Ultima fatura está na media"})
+
+        conn.sendall(response)
+
+    elif "/usuario/alerta/excesso/?" in request_path:
+        # Analisando a URL da solicitação para obter os parâmetros de consulta
+        parametros_de_consulta = urllib.parse.parse_qs(
+            urllib.parse.urlparse(request_path).query
+        )
+        # Obtendo o valor do Query Param 'id'
+        id = parametros_de_consulta.get("id", None)
+        print("consultar alerta de usuario de id: " + id[0])
+        usuario = lista_usuarios[int(id[0])]
+
+        if(usuario.alerta_consumo_excessivo == True):
+            response = OK({"Alerta!!": "Sua Ultima fatura possui um consumo excessivo"})
+        else:
+            response = OK({"Sem alertas": "Sua Ultima fatura está na media de consumo das outras"})
+
+        conn.sendall(response)
 
 def receivePost(
     request_path,
