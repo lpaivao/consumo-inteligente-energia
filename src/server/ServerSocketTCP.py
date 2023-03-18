@@ -77,7 +77,7 @@ class ServidorTCP:
     def escuta_cliente(self, cliente, addr):
         try:
             while True:
-                mensagem = cliente.recv(1024)
+                mensagem = cliente.recv(4096)
                 if not mensagem:
                     break
 
@@ -172,14 +172,16 @@ def udp_listener():
 
     try:
         while True:
-            data, addr = udp_sock.recvfrom(1024)
-            print(f"Received message from {addr}: {data}")
+            data, addr = udp_sock.recvfrom(4096)
+            #print(f"Received message from {addr}: {data}")
             # Process data and send to client through TCP socket
             #
             parsed_data = fct.parse_packet(data)
             client_id = parsed_data[0]
             timestamp = parsed_data[1]
             consumo = parsed_data[2]
+            consumo = round(consumo/10000, 4)
+            print(consumo)
 
             if client_id in lista.keys():
                 # Criando um objeto datetime a partir do timestamp
@@ -207,7 +209,7 @@ def handle_client(cliente, addr, evento):
     with cliente:
         while not evento.is_set():
             print(f"Conexão estabelecida por {addr}")
-            data = cliente.recv(1024)  # recebe os dados enviados pelo cliente
+            data = cliente.recv(4096)  # recebe os dados enviados pelo cliente
             if data:
                 http_request = data.decode()
 

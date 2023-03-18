@@ -5,6 +5,7 @@ import urllib.request
 from src.utils.HttpUtils import *
 import src.entities.Usuario as user
 
+
 def splitHttpReq(http_request):
     # exemplo de string de requisição HTTP
     # http_request = 'POST /api/data HTTP/1.1\r\nContent-Type: application/json\r\nContent-Length: 23\r\n\r\n{"key": "value", "key2": 2}'
@@ -32,7 +33,6 @@ def splitHttpReq(http_request):
 
 
 def splitHttpResp(http_response):
-
     # dividir a string em duas partes
     response_parts = http_response.split("\r\n\r\n")
     header_part = response_parts[0]
@@ -55,25 +55,46 @@ def splitHttpResp(http_response):
 
 
 def receiveGet(
-     request_path, conn, lista_usuarios
+        request_path, conn, lista_usuarios
 ):
     if "/usuario/?" in request_path:
         parametros_de_consulta = urllib.parse.parse_qs(
             urllib.parse.urlparse(request_path).query
         )
+        try:
+            # Obtendo o valor do Query Param 'id'
+            id = int(parametros_de_consulta["id"][0])
+            if id not in lista_usuarios.keys():
+                body_response = {"Mensagem": "Id nao encontrado"}
+                body_response = json.dumps(body_response)
+                conn.sendall(NotFound(body_response))
+                ##########################################
+            else:
+                # dados = lista_usuarios[id].__dict__
+                # body = json.dumps(dados)
+                body = lista_usuarios[id].toJson()
+                response = OK(body)
+                conn.sendall(response)
+        except:
+            response = BadRequest({"mensagem": "erro"})
+            conn.sendall(response)
 
-        # Obtendo o valor do Query Param 'id'
-        id = int(parametros_de_consulta["id"][0])
-        if id not in lista_usuarios.keys():
-            body_response = {"Mensagem": "Id nao encontrado"}
-            body_response = json.dumps(body_response)
-            conn.sendall(NotFound(body_response))
-            ##########################################
-        else:
-            #dados = lista_usuarios[id].__dict__
-            #body = json.dumps(dados)
-            body = lista_usuarios[id].toJson()
-            response = OK(body)
+    elif request_path == "/usuario/":
+        try:
+            if len(lista_usuarios) == 0:
+                body_response = {"Mensagem": "Nao tem usuarios cadastrados"}
+                body_response = json.dumps(body_response)
+                conn.sendall(NotFound(body_response))
+            else:
+                lista_all = []
+                for usuario in lista_usuarios.values():
+                    lista_all.append(usuario.toJson())
+
+                body = {"Usuarios": lista_all}
+                response = OK(body)
+                conn.sendall(response)
+        except:
+            response = BadRequest({"mensagem": "erro"})
             conn.sendall(response)
 
     elif "/usuario/fatura/" in request_path:
@@ -81,124 +102,244 @@ def receiveGet(
         parametros_de_consulta = urllib.parse.parse_qs(
             urllib.parse.urlparse(request_path).query
         )
-        # Obtendo o valor do Query Param 'id'
-        id = int(parametros_de_consulta["id"][0])
-        mes = parametros_de_consulta["mes"][0]
-        if id not in lista_usuarios.keys():
-            body_response = {"Mensagem": "Id nao encontrado"}
-            body_response = json.dumps(body_response)
-            conn.sendall(NotFound(body_response))
-        else:
-            usuario = lista_usuarios[int(id)]
-            if mes not in usuario.fatura.keys():
-                body_response = {"Mensagem": "Mes nao encontrado"}
+        try:
+            # Obtendo o valor do Query Param 'id'
+            id = int(parametros_de_consulta["id"][0])
+            mes = parametros_de_consulta["mes"][0]
+            if id not in lista_usuarios.keys():
+                body_response = {"Mensagem": "Id nao encontrado"}
                 body_response = json.dumps(body_response)
                 conn.sendall(NotFound(body_response))
             else:
-                fatura = usuario.fatura[mes[0]]
-                fatura = {"valor da fatura": fatura}
-                body = json.dumps(fatura)
+                usuario = lista_usuarios[int(id)]
+                if mes not in usuario.fatura.keys():
+                    body_response = {"Mensagem": "Mes nao encontrado"}
+                    body_response = json.dumps(body_response)
+                    conn.sendall(NotFound(body_response))
+                else:
+                    fatura = usuario.fatura[mes[0]]
+                    fatura = {"valor da fatura": fatura}
+                    body = json.dumps(fatura)
 
-                response = OK(body)
-                conn.sendall(response)
+                    response = OK(body)
+                    conn.sendall(response)
+        except:
+            response = BadRequest({"mensagem": "erro"})
+            conn.sendall(response)
 
     elif "/usuario/consumo/?" in request_path:
         # Analisando a URL da solicitação para obter os parâmetros de consulta
         parametros_de_consulta = urllib.parse.parse_qs(
             urllib.parse.urlparse(request_path).query
         )
-        # Obtendo o valor do Query Param 'id'
-        id = parametros_de_consulta.get("id", None)
-        print("consultar consumo de usuario de id: " + id[0])
-        usuario = lista_usuarios[int(id[0])]
-        consumo = usuario.consumo
+        try:
+            # Obtendo o valor do Query Param 'id'
+            id = int(parametros_de_consulta["id"][0])
 
-        response = OK({"consumo": consumo})
+            if id not in lista_usuarios.keys():
+                body_response = {"Mensagem": "Id nao encontrado"}
+                body_response = json.dumps(body_response)
+                conn.sendall(NotFound(body_response))
+            else:
+                print("consultar consumo de usuario de id: " + str(id))
+                usuario = lista_usuarios[id]
+                consumo = usuario.consumo
 
-        conn.sendall(response)
+                response = OK({"consumo": consumo})
+
+                conn.sendall(response)
+        except:
+            response = BadRequest({"mensagem": "erro"})
+            conn.sendall(response)
+
+    elif "/usuario/consumo/data/?" in request_path:
+        # Analisando a URL da solicitação para obter os parâmetros de consulta
+        parametros_de_consulta = urllib.parse.parse_qs(
+            urllib.parse.urlparse(request_path).query
+        )
+        try:
+            # Obtendo o valor do Query Param 'id'
+            id = int(parametros_de_consulta["id"][0])
+            data = parametros_de_consulta["data"][0]
+
+            if id not in lista_usuarios.keys():
+                body_response = {"Mensagem": "Id nao encontrado"}
+                body_response = json.dumps(body_response)
+                conn.sendall(NotFound(body_response))
+                ##########################################
+            else:
+                print("consultar consumo por data de usuario de id: " + str(id))
+                usuario = lista_usuarios[id]
+                consumo = usuario.consumo
+
+                lista_temporaria = []
+                for tupla in consumo:
+                    print(tupla[0])
+                    if tupla[0] == data:
+                        lista_temporaria.append(tupla)
+
+                if len(lista_temporaria) != 0:
+                    response = OK({"dia": data, "consumo": lista_temporaria})
+                else:
+                    response = NotFound({"consumo": "Nao tem consumos com essa data"})
+
+                conn.sendall(response)
+        except:
+            response = BadRequest({"mensagem": "erro"})
+            conn.sendall(response)
+
+    elif "/usuario/consumo/horario/?" in request_path:
+        # Analisando a URL da solicitação para obter os parâmetros de consulta
+        parametros_de_consulta = urllib.parse.parse_qs(
+            urllib.parse.urlparse(request_path).query
+        )
+        try:
+            # Obtendo o valor do Query Param 'id'
+            id = int(parametros_de_consulta["id"][0])
+            data = parametros_de_consulta["data"][0]
+            horario = parametros_de_consulta["horario"][0]
+
+            if id not in lista_usuarios.keys():
+                body_response = {"Mensagem": "Id nao encontrado"}
+                body_response = json.dumps(body_response)
+                conn.sendall(NotFound(body_response))
+                ##########################################
+            else:
+                print("consultar consumo por horario de usuario de id: " + str(id))
+                usuario = lista_usuarios[id]
+                consumo = usuario.consumo
+
+                lista_temporaria_data = []
+                for tupla in consumo:
+                    if tupla[0] == data:
+                        lista_temporaria_data.append(tupla)
+
+                if len(lista_temporaria_data) != 0:
+                    lista_temporaria_horario = []
+                    for tupla in lista_temporaria_data:
+                        if horario in tupla[1]:
+                            lista_temporaria_horario.append(tupla)
+                    response = OK({"dia": data, "horario": horario, "consumo": lista_temporaria_horario})
+                else:
+                    response = NotFound({"consumo": "Nao tem consumos com esse horario"})
+
+                conn.sendall(response)
+        except:
+            response = BadRequest({"mensagem": "erro"})
+            conn.sendall(response)
 
     elif "/usuario/alerta/variacao/?" in request_path:
         # Analisando a URL da solicitação para obter os parâmetros de consulta
         parametros_de_consulta = urllib.parse.parse_qs(
             urllib.parse.urlparse(request_path).query
         )
-        # Obtendo o valor do Query Param 'id'
-        id = parametros_de_consulta.get("id", None)
-        print("consultar alerta de usuario de id: " + id[0])
-        usuario = lista_usuarios[int(id[0])]
+        try:
+            # Obtendo o valor do Query Param 'id'
+            id = int(parametros_de_consulta["id"][0])
 
-        if(usuario.alerta_grande_variacao == True):
-            response = OK({"Alerta!!": "Sua Ultima fatura possui grande variacao"})
-        else:
-            response = OK({"Sem alertas": "Sua Ultima fatura está na media"})
+            if id not in lista_usuarios.keys():
+                body_response = {"Mensagem": "Id nao encontrado"}
+                body_response = json.dumps(body_response)
+                conn.sendall(NotFound(body_response))
+                ##########################################
+            else:
+                print("consultar alerta de usuario de id: " + str(id))
+                usuario = lista_usuarios[id]
 
-        conn.sendall(response)
+                if usuario.alerta_grande_variacao == True:
+                    response = OK({"Alerta!!": "Sua Ultima fatura possui grande variacao"})
+                else:
+                    response = OK({"Sem alertas": "Sua Ultima fatura está na media"})
+
+                conn.sendall(response)
+        except:
+            response = BadRequest({"mensagem": "erro"})
+            conn.sendall(response)
 
     elif "/usuario/alerta/excesso/?" in request_path:
         # Analisando a URL da solicitação para obter os parâmetros de consulta
         parametros_de_consulta = urllib.parse.parse_qs(
             urllib.parse.urlparse(request_path).query
         )
-        # Obtendo o valor do Query Param 'id'
-        id = parametros_de_consulta.get("id", None)
-        print("consultar alerta de usuario de id: " + id[0])
-        usuario = lista_usuarios[int(id[0])]
+        try:
+            # Obtendo o valor do Query Param 'id'
+            id = int(parametros_de_consulta["id"][0])
+            print("consultar alerta de usuario de id: " + str(id))
+            usuario = lista_usuarios[id]
 
-        if(usuario.alerta_consumo_excessivo == True):
-            response = OK({"Alerta!!": "Sua Ultima fatura possui um consumo excessivo"})
-        else:
-            response = OK({"Sem alertas": "Sua Ultima fatura está na media de consumo das outras"})
+            if id not in lista_usuarios.keys():
+                body_response = {"Mensagem": "Id nao encontrado"}
+                body_response = json.dumps(body_response)
+                conn.sendall(NotFound(body_response))
+                ##########################################
+            else:
+                if (usuario.alerta_consumo_excessivo == True):
+                    response = OK({"Alerta!!": "Sua Ultima fatura possui um consumo excessivo"})
+                else:
+                    response = OK({"Sem alertas": "Sua Ultima fatura está na media de consumo das outras"})
 
-        conn.sendall(response)
+                conn.sendall(response)
+        except:
+            response = BadRequest({"mensagem": "erro"})
+            conn.sendall(response)
+
 
 def receivePost(
-    request_path,
-    body,
-    conn,
-    lista_usuarios,
+        request_path,
+        body,
+        conn,
+        lista_usuarios,
 ):
     if request_path == "/usuario/cadastro/":
-        data = json.loads(body)
+        try:
+            data = json.loads(body)
+            # Faça algo com os dados recebidos
+            id = data["id"]
+            nome = data["nome"]
+            endereco = data["endereco"]
 
-        # Faça algo com os dados recebidos
-        id = data["id"]
-        nome = data["nome"]
-        endereco = data["endereco"]
+            if id in lista_usuarios.keys():
+                body_response = {"Mensagem": "Usuario ja cadastrado"}
+                body_response = json.dumps(body_response)
+                conn.sendall(NotFound(body_response))
+            else:
+                usuario = user.Usuario(id, nome, endereco)
+                lista_usuarios[id] = usuario
+                body_response = {"mensagem": "Cadastro feito com sucesso!", "id": id, "nome": nome, "endereco": endereco}
+                # body_response = {"id": id, "nome": nome, "endereco": endereco}
+                body_response = json.dumps(body_response)
 
-        usuario = user.Usuario(id, nome, endereco)
-        lista_usuarios[id] = usuario
-        # ...
-
-        # response_data = {"mensagem": "Cadastro feito com sucesso!", "id": id, "nome": nome, "endereco": endereco}
-        body_response = {"id": id, "nome": nome, "endereco": endereco}
-        body_response = json.dumps(body_response)
-
-        conn.sendall(OK(body_response))
+                conn.sendall(OK(body_response))
+        except:
+            response = BadRequest({"mensagem": "erro"})
+            conn.sendall(response)
 
 
 def receiveDelete(
-     request_path, conn, lista_usuarios
+        request_path, conn, lista_usuarios
 ):
     if "/usuario/delete/?" in request_path:
-        print("entrou")
         parametros_de_consulta = urllib.parse.parse_qs(
             urllib.parse.urlparse(request_path).query
         )
-
-        # Obtendo o valor do Query Param 'id'
-        id = int(parametros_de_consulta["id"][0])
-        if id not in lista_usuarios.keys():
-            body_response = {"Mensagem": "Id nao encontrado"}
-            body_response = json.dumps(body_response)
-            conn.sendall(NotFound(body_response))
-        else:
-            # Realizando a ação de delete com o ID obtido
-            # ...
-            removido = lista_usuarios.pop(id)
-            # ...
-            response_data = removido.dataString()
-            body_response = json.dumps(response_data)
-            conn.sendall(OK(body_response))
+        try:
+            # Obtendo o valor do Query Param 'id'
+            id = int(parametros_de_consulta["id"][0])
+            if id not in lista_usuarios.keys():
+                body_response = {"Mensagem": "Id nao encontrado"}
+                body_response = json.dumps(body_response)
+                conn.sendall(NotFound(body_response))
+            else:
+                # Realizando a ação de delete com o ID obtido
+                # ...
+                removido = lista_usuarios.pop(id)
+                # ...
+                response_data = removido.dataString()
+                body_response = json.dumps(response_data)
+                conn.sendall(OK(body_response))
+        except:
+            response = BadRequest({"mensagem": "erro"})
+            conn.sendall(response)
 
 
 # Protocolos de resposta sem body

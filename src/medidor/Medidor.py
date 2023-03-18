@@ -14,9 +14,9 @@ consumo_padrao_mensal = 150  # KwH
 consumo_maior_mensal = 310
 consumo_menor_mensal = 95
 
-consumo_padrao_segundos = 0.05
-consumo_maior_segundos = 0.1
-consumo_menor_segundos = 0.03
+consumo_padrao_segundos = 0.0005
+consumo_maior_segundos = 0.001
+consumo_menor_segundos = 0.0003
 
 consumo_inicial = consumo_padrao_segundos
 
@@ -51,7 +51,7 @@ def parse_packet(data):
     # Desempacota os campos do pacote
     client_id, timestamp, energy = struct.unpack(PACKET_FORMAT, packet_data)
     # Retorna os dados desempacotados
-    return client_id, timestamp, energy
+    return round(client_id, 4), timestamp, energy
 
 
 class SocketThread(threading.Thread):
