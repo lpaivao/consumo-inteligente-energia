@@ -56,15 +56,12 @@ def verifica_fechamento_fatura(date, time):
 def fecha_fatura(usuario, consumo, mes):
     print("Entrou no fechamento de fatura")
     valor_fatura = consumo * const.TARIFA_ENERGIA
-    usuario.fatura[mes] = {"consumo": consumo, "valor": valor_fatura}
-    if (consumo >= media_faturas() + const.ALERTA_VARIACAO):
-        usuario.alerta_grande_variacao == True
-        if (consumo >= media_faturas() + const.ALERTA_EXCESSIVO):
-            usuario.alerta_grande_variacao == True
-        else:
-            usuario.alerta_grande_variacao == False
+    usuario.fatura[mes] = (consumo, valor_fatura)
+
+    if consumo >= media_faturas() + const.ALERTA_EXCESSIVO:
+        usuario.alerta_consumo_excessivo == True
     else:
-        usuario.alerta_grande_variacao == False
+        usuario.alerta_consumo_excessivo == False
 
 
 def media_faturas(usuario, fatura):
