@@ -1,13 +1,23 @@
-# Desempacota os dados
-# Define a estrutura do pacote UDP
 import hashlib
 import struct
 import Constantes as const
 
+# Define a estrutura do pacote UDP
 PACKET_FORMAT = "Iqf"
 PACKET_SIZE = struct.calcsize(PACKET_FORMAT)
 
 
+# Empacota os dados
+def create_packet(client_id, timestamp, energy):
+    # Codifica os campos em bytes e empacota em um pacote UDP
+    packed_data = struct.pack(PACKET_FORMAT, client_id, timestamp, energy)
+    # Calcula um checksum/hash dos dados para garantir a integridade do pacote
+    packet_hash = hashlib.md5(packed_data).digest()
+    # Retorna o pacote UDP concatenando os dados e o hash
+    return packed_data + packet_hash
+
+
+# Desempacota os dados
 def parse_packet(data):
     # Verifica se o pacote tem o tamanho correto e calcula o hash
     if len(data) != PACKET_SIZE + 16:
@@ -23,6 +33,7 @@ def parse_packet(data):
     return client_id, timestamp, energy
 
 
+# Verificva se é o dia do fechamento da fatura
 def verifica_fechamento_fatura(date, time):
     # Pega o dia e o mes separados
     date_format = date.split("-")
@@ -41,6 +52,7 @@ def verifica_fechamento_fatura(date, time):
     return False
 
 
+# Fecha a fatura
 def fecha_fatura(usuario, consumo, mes):
     print("Entrou no fechamento de fatura")
     valor_fatura = consumo * const.TARIFA_ENERGIA
@@ -61,3 +73,30 @@ def media_faturas(usuario, fatura):
         media += value
 
     return media
+
+
+def mes_anterior(mes):
+    if mes == "01":
+        return "12"
+    elif mes == "02":
+        return "01"
+    elif mes == "03":
+        return "02"
+    elif mes == "04":
+        return "03"
+    elif mes == "05":
+        return "04"
+    elif mes == "06":
+        return "05"
+    elif mes == "07":
+        return "06"
+    elif mes == "08":
+        return "07"
+    elif mes == "09":
+        return "08"
+    elif mes == "10":
+        return "09"
+    elif mes == "11":
+        return "10"
+    elif mes == "12":
+        return "11"

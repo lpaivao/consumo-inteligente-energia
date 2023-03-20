@@ -1,13 +1,10 @@
 import datetime
-
 import time
 import socket
 import threading
-
 import Constantes as const
 import Funcoes as fct
-
-# from ServerHttp import RequestHandler as rh
+import Usuario as user
 from HttpUtils import *
 
 # Variaveis
@@ -86,11 +83,11 @@ def udp_listener():
 
     while True:
         try:
+            # Recebe a mensagem
             data, addr = udp_sock.recvfrom(4096)
-            # print(f"Received message from {addr}: {data}")
-            # Process data and send to client through TCP socket
-            #
+            # Desempacota os dados
             parsed_data = fct.parse_packet(data)
+            # Separa os dados desempacotados
             client_id = parsed_data[0]
             timestamp = parsed_data[1]
             consumo = parsed_data[2]
@@ -102,17 +99,23 @@ def udp_listener():
                 dt = datetime.datetime.fromtimestamp(timestamp)
                 # Obtendo a data e o horário separadamente
                 date = dt.strftime("%Y-%m-%d")  # formato YYYY-MM-DD
-                time = dt.strftime("%H:%M:%S")  # formato HH:MM:SS
+                hora = dt.strftime("%H:%M:%S")  # formato HH:MM:SS
 
                 # Pega o mes
                 date_format = date.split("-")
                 mes = date_format[1]
                 # Faz a tupla para adicionar a lista de consumo do cliente
-                tupla_consumo = (date, time, consumo)
+                tupla_consumo = (date, hora, consumo)
                 usuario = lista[client_id]
                 usuario.consumo.append(tupla_consumo)
 
-                if fct.verifica_fechamento_fatura(date, time):
+                # Verifica se houve uma grande variação no consumo em relação a fatura do mês anterior
+                if fct.mes_anterior(mes) in usuario.fatura.keys():
+                    if consumo >= usuario.fatura[fct.mes_anterior(mes)][0] + const.ALERTA_VARIACAO:
+                        usuario.alerta_grande_variacao = True
+
+                # Verifica se está no dia e horário para fechamento da fatura
+                if fct.verifica_fechamento_fatura(date, hora):
                     fct.fecha_fatura(usuario, consumo, mes)
 
         except KeyboardInterrupt:

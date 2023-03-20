@@ -5,11 +5,7 @@ import Usuario as user
 
 
 def splitHttpReq(http_request):
-    # exemplo de string de requisição HTTP
-    # http_request = 'POST /api/data HTTP/1.1\r\nContent-Type: application/json\r\nContent-Length: 23\r\n\r\n{"key": "value", "key2": 2}'
-
     # dividir a string em três partes
-
     request_parts = http_request.split("\r\n\r\n")
     header_part = request_parts[0]
     body_part = request_parts[1]
@@ -25,7 +21,7 @@ def splitHttpReq(http_request):
     # print(request_path)    # /api/data
     # print(request_protocol) # HTTP/1.1
     # print(headers)         # ['Content-Type: application/json', 'Content-Length: 23']
-    # print(body_part)       # {"key": "value", "key2": 2}
+    # print(body_part)       # {"key": "value"}
 
     return request_method, request_path, request_protocol, headers, body_part
 
@@ -95,7 +91,7 @@ def receiveGet(
             response = BadRequest({"mensagem": "erro"})
             conn.sendall(response)
 
-    elif "/usuario/fatura/" in request_path:
+    elif "/usuario/fatura/?" in request_path:
         # Analisando a URL da solicitação para obter os parâmetros de consulta
         parametros_de_consulta = urllib.parse.parse_qs(
             urllib.parse.urlparse(request_path).query
@@ -109,14 +105,14 @@ def receiveGet(
                 body_response = json.dumps(body_response)
                 conn.sendall(NotFound(body_response))
             else:
-                usuario = lista_usuarios[int(id)]
+                usuario = lista_usuarios[id]
                 if mes not in usuario.fatura.keys():
                     body_response = {"Mensagem": "Mes nao encontrado"}
                     body_response = json.dumps(body_response)
                     conn.sendall(NotFound(body_response))
                 else:
-                    fatura = usuario.fatura[mes[0]]
-                    fatura = {"valor da fatura": fatura}
+                    fatura = usuario.fatura[mes]
+                    fatura = {"consumo": fatura[0], "valor da fatura": fatura[1]}
                     body = json.dumps(fatura)
 
                     response = OK(body)
@@ -139,7 +135,6 @@ def receiveGet(
                 body_response = json.dumps(body_response)
                 conn.sendall(NotFound(body_response))
             else:
-                print("consultar consumo de usuario de id: " + str(id))
                 usuario = lista_usuarios[id]
                 consumo = usuario.consumo
 
@@ -166,13 +161,11 @@ def receiveGet(
                 conn.sendall(NotFound(body_response))
                 ##########################################
             else:
-                print("consultar consumo por data de usuario de id: " + str(id))
                 usuario = lista_usuarios[id]
                 consumo = usuario.consumo
 
                 lista_temporaria = []
                 for tupla in consumo:
-                    print(tupla[0])
                     if tupla[0] == data:
                         lista_temporaria.append(tupla)
 
@@ -203,7 +196,6 @@ def receiveGet(
                 conn.sendall(NotFound(body_response))
                 ##########################################
             else:
-                print("consultar consumo por horario de usuario de id: " + str(id))
                 usuario = lista_usuarios[id]
                 consumo = usuario.consumo
 
@@ -239,13 +231,12 @@ def receiveGet(
                 body_response = {"Mensagem": "Id nao encontrado"}
                 body_response = json.dumps(body_response)
                 conn.sendall(NotFound(body_response))
-                ##########################################
             else:
-                print("consultar alerta de usuario de id: " + str(id))
                 usuario = lista_usuarios[id]
 
-                if usuario.alerta_grande_variacao == True:
+                if usuario.alerta_grande_variacao:
                     response = OK({"Alerta!!": "Sua Ultima fatura possui grande variacao"})
+                    # usuario.alerta_grande_variacao = False
                 else:
                     response = OK({"Sem alertas": "Sua Ultima fatura está na media"})
 
@@ -262,17 +253,16 @@ def receiveGet(
         try:
             # Obtendo o valor do Query Param 'id'
             id = int(parametros_de_consulta["id"][0])
-            print("consultar alerta de usuario de id: " + str(id))
             usuario = lista_usuarios[id]
 
             if id not in lista_usuarios.keys():
                 body_response = {"Mensagem": "Id nao encontrado"}
                 body_response = json.dumps(body_response)
                 conn.sendall(NotFound(body_response))
-                ##########################################
             else:
-                if (usuario.alerta_consumo_excessivo == True):
+                if usuario.alerta_consumo_excessivo:
                     response = OK({"Alerta!!": "Sua Ultima fatura possui um consumo excessivo"})
+                    # usuario.alerta_consumo_excessivo = False
                 else:
                     response = OK({"Sem alertas": "Sua Ultima fatura está na media de consumo das outras"})
 
@@ -303,7 +293,8 @@ def receivePost(
             else:
                 usuario = user.Usuario(id, nome, endereco)
                 lista_usuarios[id] = usuario
-                body_response = {"mensagem": "Cadastro feito com sucesso!", "id": id, "nome": nome, "endereco": endereco}
+                body_response = {"mensagem": "Cadastro feito com sucesso!", "id": id, "nome": nome,
+                                 "endereco": endereco}
                 # body_response = {"id": id, "nome": nome, "endereco": endereco}
                 body_response = json.dumps(body_response)
 
