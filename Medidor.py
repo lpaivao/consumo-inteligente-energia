@@ -1,14 +1,13 @@
 import datetime
 import random
 import socket
-import time
 import struct
 import hashlib
 import time
 import threading
 
-from src.utils import Constantes as const
-import src.utils.Funcoes as fct
+import Constantes as const
+import Funcoes as fct
 
 consumo_padrao_mensal = 150  # KwH
 consumo_maior_mensal = 310

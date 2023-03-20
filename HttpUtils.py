@@ -1,9 +1,7 @@
-import json
 import urllib.parse
-import urllib.request
-
-from src.utils.HttpUtils import *
-import src.entities.Usuario as user
+import json
+from HttpUtils import *
+import Usuario as user
 
 
 def splitHttpReq(http_request):

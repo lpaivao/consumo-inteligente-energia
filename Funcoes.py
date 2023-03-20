@@ -2,7 +2,7 @@
 # Define a estrutura do pacote UDP
 import hashlib
 import struct
-import src.utils.Constantes as const
+import Constantes as const
 
 PACKET_FORMAT = "Iqf"
 PACKET_SIZE = struct.calcsize(PACKET_FORMAT)

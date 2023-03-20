@@ -2,9 +2,9 @@ import json
 import urllib.parse
 import urllib.request
 from http.server import BaseHTTPRequestHandler, HTTPServer
-from utils.HttpUtils import *
+from HttpUtils import *
 
-from entities.Usuario import Usuario
+from Usuario import Usuario
 
 HOST = "127.0.0.1"  # Endereço IP do servidor
 PORT = 8000  # Porta a ser usada

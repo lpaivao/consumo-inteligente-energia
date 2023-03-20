@@ -1,5 +1,4 @@
 import socket
-import select
 import Constantes as const
 
 CONTENT_TYPE = "application/json"
