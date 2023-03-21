@@ -1,5 +1,5 @@
 FROM python:3.11-slim-buster
-WORKDIR /app
-COPY .. /app
-EXPOSE 8000
+WORKDIR /medidor
+COPY . /medidor
+EXPOSE 18000
 CMD ["python3", "Medidor.py"]

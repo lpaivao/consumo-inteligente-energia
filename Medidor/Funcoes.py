@@ -33,7 +33,7 @@ def parse_packet(data):
     return client_id, timestamp, energy
 
 
-# Verificva se é o dia do fechamento da fatura
+# Verifica se é o dia do fechamento da fatura
 def verifica_fechamento_fatura(date, time):
     # Pega o dia e o mes separados
     date_format = date.split("-")
@@ -63,7 +63,7 @@ def fecha_fatura(usuario, consumo, mes):
     else:
         usuario.alerta_consumo_excessivo == False
 
-
+# Calcula a média de todas as faturas
 def media_faturas(usuario, fatura):
     media = 0.0
     for value in usuario.fatura.values():
@@ -71,7 +71,7 @@ def media_faturas(usuario, fatura):
 
     return media
 
-
+# Apenas retorna o mes anterior ao indicado no parametro
 def mes_anterior(mes):
     if mes == "01":
         return "12"
