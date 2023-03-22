@@ -87,9 +87,8 @@ Com o corpo no seguinte formato:
 O Dockerfile possui a seguinte estrutura:
 ```console
 FROM python:3.11-slim-buster
-WORKDIR /app
-COPY .. /app
-EXPOSE 15000
+WORKDIR /Servidor
+COPY .. /Servidor
 CMD ["python3", "Servidor.py"]
 ```
 
@@ -113,13 +112,13 @@ docker run -p 15000:15000 18000:18000 lpaivao/p1server:latest
 
 #### Instruções para executar o código
 1. Digitar qual o número de id do cliente que será associado ao medidor
+2. Controlar o consumo de acordo com o menu
 
 #### Dockerfile
 ```console
 FROM python:3.11-slim-buster
-WORKDIR /app
-COPY .. /app
-EXPOSE 18000
+WORKDIR /Medidor
+COPY .. /Medidor
 CMD ["python3", "Medidor.py"]
 ```
 - Comando para build da imagem:
