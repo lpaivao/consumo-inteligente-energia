@@ -77,8 +77,6 @@ def main():
                     socket_thread.consumo_adicional = socket_thread.consumo_adicional - 5.0
             except KeyboardInterrupt:
                 break
-            except:
-                print("Digite um valor válido")
     except KeyboardInterrupt:
         stop_event.set()
         socket_thread.join()
