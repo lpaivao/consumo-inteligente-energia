@@ -1,6 +1,6 @@
 UDP_PORT = 18000
 TCP_PORT = 15000
-HOST = "127.0.0.1"
+HOST = "192.168.0.67"
 TIMEOUT = 10
 
 TARIFA_ENERGIA = 0.65 # tarifa da bahia B1-residencial

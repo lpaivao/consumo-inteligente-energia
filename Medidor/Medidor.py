@@ -15,6 +15,7 @@ class SocketThread(threading.Thread):
         self.sock = sock
         self.stop_event = stop_event
         self.client_id = client_id
+        self.consumo_adicional = 0.0
 
     def run(self):
         print(f"Servidor UDP iniciado na porta {const.UDP_PORT}...")
@@ -25,6 +26,7 @@ class SocketThread(threading.Thread):
                 timestamp = int(time.time())
                 # Randomizador de consumo
                 consumo = random.randint(1, 5)
+                consumo = consumo + self.consumo_adicional
                 # Criando um objeto datetime a partir do timestamp
                 dt = datetime.datetime.fromtimestamp(timestamp)
                 # Obtendo a data e o horário separadamente
@@ -62,7 +64,21 @@ def main():
 
     try:
         while True:
-            pass
+            try:
+                opcao = int(
+                    input("Digite a opcao:\n[1] - Zerar consumo (Não aumenta nem diminui)\n[2] - Aumentar consumo ("
+                          "Aumenta +5)\n[3] - "
+                          "Diminuir consumo(Diminui -5)\n"))
+                if opcao == 1:
+                    socket_thread.consumo_adicional = 0.0
+                elif opcao == 2:
+                    socket_thread.consumo_adicional = socket_thread.consumo_adicional + 5.0
+                elif opcao == 3:
+                    socket_thread.consumo_adicional = socket_thread.consumo_adicional - 5.0
+            except KeyboardInterrupt:
+                break
+            except:
+                print("Digite um valor válido")
     except KeyboardInterrupt:
         stop_event.set()
         socket_thread.join()
