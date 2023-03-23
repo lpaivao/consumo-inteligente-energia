@@ -37,27 +37,27 @@ Parâmetros de consulta para o usuário de id=1. Para ver outro usuário basta a
 ```console
 /usuario/?id=1
 ```
-- Para ver a fatura de um determinado usuário para um determinado mês: /usuario/fatura/?id=1&mes=01
+- Para ver a fatura de um determinado usuário para um determinado mês:
 ```console
 /usuario/fatura/?id=1&mes=01
 ```
-- Para ver todos os dados de consumo disponíveis: /usuario/consumo/?id=1
+- Para ver todos os dados de consumo disponíveis:
 ```console
 /usuario/consumo/?id=1
 ```
-- Para ver os dados de consumo de uma data específica: /usuario/consumo/data/?id=1&data=2023-03-20
+- Para ver os dados de consumo de uma data específica:
 ```console
 /usuario/consumo/data/?id=1&data=2023-03-20
 ```
-- Para ver os dados de consumo de uma data e horário específicos: /usuario/consumo/horario/?id=1&data=2023-03-20&horario=14:10:
+- Para ver os dados de consumo de uma data e horário específicos:
 ```console
 /usuario/consumo/horario/?id=1&data=2023-03-20&horario=14:10:
 ```
-- Para ver se há algum alerta de de grande variação: /usuario/alerta/variacao/?id=1
+- Para ver se há algum alerta de de grande variação:
 ```console
 /usuario/alerta/variacao/?id=1
 ```
-- Para ver se há algum alerta de consumo excessivo: /usuario/alerta/excesso/?id=1
+- Para ver se há algum alerta de consumo excessivo:
 ```console
 /usuario/alerta/excesso/?id=1
 ```
@@ -91,11 +91,6 @@ WORKDIR /Servidor
 COPY .. /Servidor
 CMD ["python3", "Servidor.py"]
 ```
-
-- Comando para build da imagem:
-```console
-docker build -t lpaivao/p1server .
-```
 - Comando para pull da imagem:
 ```console
 docker pull lpaivao/p1server:latest
@@ -111,8 +106,7 @@ docker run -p 15000:15000 18000:18000 lpaivao/p1server:latest
 - Constantes.py: Mesma utilidade do arquivo de mesmo nome do servidor.
 
 #### Instruções para executar o código
-1. Digitar qual o número de id do cliente que será associado ao medidor
-2. Controlar o consumo de acordo com o menu
+1. Apenas executar, pois cada imagem do container possui um id[1-3] associado ao medidor.
 
 #### Dockerfile
 ```console
@@ -121,15 +115,15 @@ WORKDIR /Medidor
 COPY .. /Medidor
 CMD ["python3", "Medidor.py"]
 ```
-- Comando para build da imagem:
+- Comando para pull da imagem dos três medidores automáiticos:
 ```console
-docker build -t lpaivao/p1med .
-```
-- Comando para pull da imagem:
-```console
-docker pull lpaivao/p1med:latest
+docker pull lpaivao/p1med:auto1
+docker pull lpaivao/p1med:auto2
+docker pull lpaivao/p1med:auto3
 ```
 - Comando para run da imagem:
 ```console
-docker run -p 18000:18000 lpaivao/p1med:latest
+docker run -p 18000:18000 lpaivao/p1med:auto1
+docker run -p 18000:18000 lpaivao/p1med:auto2
+docker run -p 18000:18000 lpaivao/p1med:auto3
 ```
