@@ -57,7 +57,7 @@ def main():
 
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     stop_event = threading.Event()
-    socket_thread = SocketThread(sock, stop_event, 2)
+    socket_thread = SocketThread(sock, stop_event, 4)
     socket_thread.start()
 
     try:
