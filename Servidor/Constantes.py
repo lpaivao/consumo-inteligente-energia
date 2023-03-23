@@ -1,6 +1,8 @@
+import socket
+
 UDP_PORT = 18000
 TCP_PORT = 15000
-HOST = "localhost"
+HOST = socket.gethostbyname(socket.gethostname())
 TIMEOUT = 10
 
 TARIFA_ENERGIA = 0.65  # tarifa da bahia B1-residencial

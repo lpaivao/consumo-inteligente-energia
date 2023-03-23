@@ -56,8 +56,9 @@ def tcp_listener():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         # s.setblocking(False)
+        print(f"Tentativa de conexão em {const.HOST}:{const.TCP_PORT}")
         s.bind((const.HOST, const.TCP_PORT))
-        s.listen(3)  # coloca o socket em modo de escuta
+        s.listen()  # coloca o socket em modo de escuta
         print(f"Servidor iniciado em {const.HOST}:{const.TCP_PORT}")
 
         while True:
@@ -73,11 +74,13 @@ def tcp_listener():
                 evento.set()
                 thread.join()
             except KeyboardInterrupt:
+                s.shutdown()
                 s.close()
                 break
 
 
 def udp_listener():
+    print(f"Tentativa de conexão em {const.HOST}:{const.UDP_PORT}")
     udp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     udp_sock.bind((const.HOST, const.UDP_PORT))
 
@@ -119,6 +122,7 @@ def udp_listener():
                     fct.fecha_fatura(usuario, consumo, mes)
 
         except KeyboardInterrupt:
+            udp_sock.shutdown()
             udp_sock.close()
             break
 
