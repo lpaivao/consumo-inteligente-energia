@@ -58,7 +58,7 @@ def tcp_listener():
         # s.setblocking(False)
         s.bind((const.HOST, const.TCP_PORT))
         s.listen(3)  # coloca o socket em modo de escuta
-        print(f"Servidor iniciado na porta {const.TCP_PORT}...")
+        print(f"Servidor iniciado em {const.HOST}:{const.TCP_PORT}")
 
         while True:
             try:
@@ -124,6 +124,7 @@ def udp_listener():
 
 
 if __name__ == "__main__":
+
     udp_thread = threading.Thread(target=udp_listener)
     udp_thread.start()
 
