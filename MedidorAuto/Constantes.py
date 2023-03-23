@@ -3,7 +3,7 @@ TCP_PORT = 15000
 HOST = "172.16.103.12"
 TIMEOUT = 10
 
-TARIFA_ENERGIA = 0.65 # tarifa da bahia B1-residencial
+TARIFA_ENERGIA = 0.65  # tarifa da bahia B1-residencial
 DIA_FECHAMENTO = "10"
 
 ALERTA_EXCESSIVO = 150.0
