@@ -92,7 +92,7 @@ def udp_listener():
             timestamp = parsed_data[1]
             consumo = parsed_data[2]
             consumo = round(consumo / 10000, 4)
-            print(consumo)
+            print(f"Medidor do Cliente[{client_id}] = {consumo}")
 
             if client_id in lista.keys():
                 # Criando um objeto datetime a partir do timestamp
