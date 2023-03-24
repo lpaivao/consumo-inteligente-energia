@@ -6,17 +6,6 @@ import Constantes as const
 PACKET_FORMAT = "Iqf"
 PACKET_SIZE = struct.calcsize(PACKET_FORMAT)
 
-
-# Empacota os dados
-def create_packet(client_id, timestamp, energy):
-    # Codifica os campos em bytes e empacota em um pacote UDP
-    packed_data = struct.pack(PACKET_FORMAT, client_id, timestamp, energy)
-    # Calcula um checksum/hash dos dados para garantir a integridade do pacote
-    packet_hash = hashlib.md5(packed_data).digest()
-    # Retorna o pacote UDP concatenando os dados e o hash
-    return packed_data + packet_hash
-
-
 # Desempacota os dados
 def parse_packet(data):
     # Verifica se o pacote tem o tamanho correto e calcula o hash
@@ -33,7 +22,7 @@ def parse_packet(data):
     return client_id, timestamp, energy
 
 
-# Verificva se é o dia do fechamento da fatura
+# Verifica se é o dia do fechamento da fatura
 def verifica_fechamento_fatura(date, time):
     # Pega o dia e o mes separados
     date_format = date.split("-")
@@ -63,7 +52,7 @@ def fecha_fatura(usuario, consumo, mes):
     else:
         usuario.alerta_consumo_excessivo == False
 
-
+# Calcula média de todas as faturas
 def media_faturas(usuario, fatura):
     media = 0.0
     for value in usuario.fatura.values():
@@ -71,7 +60,7 @@ def media_faturas(usuario, fatura):
 
     return media
 
-
+# Retorna o mês anterior
 def mes_anterior(mes):
     if mes == "01":
         return "12"

@@ -7,18 +7,20 @@ import Funcoes as fct
 import Usuario as user
 from HttpUtils import *
 
-# Variaveis
+# Dicionário de clientes com a chave sendo o ID de cada usuário, e o valor sendo um objeto do tipo Usuário
 lista = {}
 
-
+# Thread para lidar com as conexões do cliente
 def handle_client(cliente, addr, evento):
     with cliente:
         while not evento.is_set():
             print(f"Conexão estabelecida por {addr}")
             data = cliente.recv(4096)  # recebe os dados enviados pelo cliente
+            # Se houver dados a serem tratados:
             if data:
                 http_request = data.decode()
 
+                # Chama função que divide a requisição HTTP
                 (
                     request_method,
                     request_path,
@@ -27,6 +29,7 @@ def handle_client(cliente, addr, evento):
                     body_part,
                 ) = splitHttpReq(http_request)
 
+                # Verifica qual método da requisição, e internamente faz os tratamentos adequados
                 if request_method == "GET":
                     receiveGet(
                         request_path,
@@ -55,7 +58,6 @@ def handle_client(cliente, addr, evento):
 def tcp_listener():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        # s.setblocking(False)
         print(f"Tentativa de conexão em {const.HOST}:{const.TCP_PORT}")
         s.bind((const.HOST, const.TCP_PORT))
         s.listen()  # coloca o socket em modo de escuta
@@ -64,7 +66,6 @@ def tcp_listener():
         while True:
             try:
                 cliente, addr = s.accept()  # aguarda a conexão de um cliente
-                # cliente.setblocking(False)
                 print(f"Cliente conectado: {addr}")
                 # cria uma nova thread para lidar com o cliente
                 evento = threading.Event()
@@ -78,7 +79,7 @@ def tcp_listener():
                 s.close()
                 break
 
-
+# Função para lidar com os dados enviados pelos medidores por uma conexão UDP
 def udp_listener():
     print(f"Tentativa de conexão em {const.HOST}:{const.UDP_PORT}")
     udp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -97,14 +98,15 @@ def udp_listener():
             consumo = round(consumo / 10000, 4)
             print(f"Medidor do Cliente[{client_id}] = {consumo}")
 
-            if client_id in lista.keys():
+            if client_id in lista.keys(): # Verifica se o ID enviado pelo medidor está na lista de clientes
+
                 # Criando um objeto datetime a partir do timestamp
                 dt = datetime.datetime.fromtimestamp(timestamp)
                 # Obtendo a data e o horário separadamente
                 date = dt.strftime("%Y-%m-%d")  # formato YYYY-MM-DD
                 hora = dt.strftime("%H:%M:%S")  # formato HH:MM:SS
 
-                # Pega o mes
+                # Pega o mês
                 date_format = date.split("-")
                 mes = date_format[1]
                 # Faz a tupla para adicionar a lista de consumo do cliente
@@ -119,6 +121,7 @@ def udp_listener():
 
                 # Verifica se está no dia e horário para fechamento da fatura
                 if fct.verifica_fechamento_fatura(date, hora):
+                    # Fecha a fatura
                     fct.fecha_fatura(usuario, consumo, mes)
 
         except KeyboardInterrupt:

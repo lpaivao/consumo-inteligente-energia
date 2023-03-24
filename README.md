@@ -1,6 +1,5 @@
-# Consumo de energia inteligente
+# Consumo de energia inteligente - Problema 1
 
-## Contexto
 Desenvolvimento de um protótipo em que os dados serão agregrados visando monitorar o consumo excessivo de energia, medir o consumo de cada cliente, gerar a fatura a ser paga, bem como alertar sobre um possível consumo excessivo de energia ou grande variação na conta de um usuário. Também, os usuários do serviço podem acessar o sistema de forma online para acompanhar o consumo de energia, com datas/horários específicos do consumo e o total acumulado.
 
 ## Produto
@@ -29,7 +28,7 @@ O produto está dividido em dois módulos:
 #### HOST e PORTAS
 
 - O servidor está configurado para escutar/responder os dados em:
-```console
+```console1
 UDP_PORT = 18000
 TCP_PORT = 15000
 HOST = socket.gethostbyname(socket.gethostname())
@@ -46,7 +45,7 @@ Quase todas as requisições são controladas por parâmetros de consulta, que s
   - Para ver outro usuário basta alterar o valor do id para algum inteiro. 
   - Para o mês, basta alterar entre um valor de 01 até 12, correspondente a cada mês. 
   - Para um horário específico, basta deixar no formato HH:MM: (para o minuto específico de certa hora)
-  - Para ver os dados de um determinado usuário: 
+- Para ver os dados de um determinado usuário: 
 ```console
 /usuario/?id=1
 ```
@@ -122,7 +121,7 @@ docker run -p 15000:15000 18000:18000 lpaivao/p1server:latest
 
 - Os medidores estão configurados para enviar os dados em:
 ```console
-HOST = "172.16.103.12"
+HOST = "172.16.103.12" (máquina 12 do LARSID)
 UDP_PORT = 18000
 ```
 
@@ -144,10 +143,12 @@ CMD ["python3", "Medidor.py"]
 docker pull lpaivao/p1med:auto1  ## Medidor associado ao cliente 1
 docker pull lpaivao/p1med:auto2  ## Medidor associado ao cliente 2
 docker pull lpaivao/p1med:auto3  ## Medidor associado ao cliente 3
+docker pull lpaivao/p1med:auto4  ## Medidor associado ao cliente 4
 ```
 - Comando para run da imagem:
 ```console
 docker run -p lpaivao/p1med:auto1
 docker run -p lpaivao/p1med:auto2
 docker run -p lpaivao/p1med:auto3
+docker run -p lpaivao/p1med:auto4
 ```

@@ -3,7 +3,7 @@ import json
 from HttpUtils import *
 import Usuario as user
 
-
+# Separa a requisição HTTP em várias partes
 def splitHttpReq(http_request):
     # dividir a string em três partes
     request_parts = http_request.split("\r\n\r\n")
@@ -25,7 +25,7 @@ def splitHttpReq(http_request):
 
     return request_method, request_path, request_protocol, headers, body_part
 
-
+# Separa a rseposta HTTP em várias partes
 def splitHttpResp(http_response):
     # dividir a string em duas partes
     response_parts = http_response.split("\r\n\r\n")
@@ -47,10 +47,11 @@ def splitHttpResp(http_response):
 
     return headers, body_part
 
-
+# Função para tratar as requisições GET
 def receiveGet(
         request_path, conn, lista_usuarios
 ):
+    # Para ver os dados de um determinado usuário:
     if "/usuario/?" in request_path:
         parametros_de_consulta = urllib.parse.parse_qs(
             urllib.parse.urlparse(request_path).query
@@ -58,14 +59,13 @@ def receiveGet(
         try:
             # Obtendo o valor do Query Param 'id'
             id = int(parametros_de_consulta["id"][0])
+
+            # Verifica se o usuário existe
             if id not in lista_usuarios.keys():
                 body_response = {"Mensagem": "Id nao encontrado"}
                 body_response = json.dumps(body_response)
                 conn.sendall(NotFound(body_response))
-                ##########################################
             else:
-                # dados = lista_usuarios[id].__dict__
-                # body = json.dumps(dados)
                 body = lista_usuarios[id].toJson()
                 response = OK(body)
                 conn.sendall(response)
@@ -73,8 +73,10 @@ def receiveGet(
             response = BadRequest({"mensagem": "erro"})
             conn.sendall(response)
 
+    # Para ver os dados de todos os usuários:
     elif request_path == "/usuario/":
         try:
+            # Verifica se há usuários cadastrados
             if len(lista_usuarios) == 0:
                 body_response = {"Mensagem": "Nao tem usuarios cadastrados"}
                 body_response = json.dumps(body_response)
@@ -91,6 +93,7 @@ def receiveGet(
             response = BadRequest({"mensagem": "erro"})
             conn.sendall(response)
 
+    # Para ver a fatura de um determinado usuário para um determinado mês:
     elif "/usuario/fatura/?" in request_path:
         # Analisando a URL da solicitação para obter os parâmetros de consulta
         parametros_de_consulta = urllib.parse.parse_qs(
@@ -100,6 +103,8 @@ def receiveGet(
             # Obtendo o valor do Query Param 'id'
             id = int(parametros_de_consulta["id"][0])
             mes = parametros_de_consulta["mes"][0]
+
+            # Verifica se o usuário existe
             if id not in lista_usuarios.keys():
                 body_response = {"Mensagem": "Id nao encontrado"}
                 body_response = json.dumps(body_response)
@@ -121,6 +126,7 @@ def receiveGet(
             response = BadRequest({"mensagem": "erro"})
             conn.sendall(response)
 
+    # Para ver todos os dados de consumo disponíveis:
     elif "/usuario/consumo/?" in request_path:
         # Analisando a URL da solicitação para obter os parâmetros de consulta
         parametros_de_consulta = urllib.parse.parse_qs(
@@ -130,6 +136,7 @@ def receiveGet(
             # Obtendo o valor do Query Param 'id'
             id = int(parametros_de_consulta["id"][0])
 
+            # Verifica se o usuário existe
             if id not in lista_usuarios.keys():
                 body_response = {"Mensagem": "Id nao encontrado"}
                 body_response = json.dumps(body_response)
@@ -145,6 +152,7 @@ def receiveGet(
             response = BadRequest({"mensagem": "erro"})
             conn.sendall(response)
 
+    # Para ver os dados de consumo de uma data específica:
     elif "/usuario/consumo/data/?" in request_path:
         # Analisando a URL da solicitação para obter os parâmetros de consulta
         parametros_de_consulta = urllib.parse.parse_qs(
@@ -155,6 +163,7 @@ def receiveGet(
             id = int(parametros_de_consulta["id"][0])
             data = parametros_de_consulta["data"][0]
 
+            # Verifica se o usuário existe
             if id not in lista_usuarios.keys():
                 body_response = {"Mensagem": "Id nao encontrado"}
                 body_response = json.dumps(body_response)
@@ -179,6 +188,7 @@ def receiveGet(
             response = BadRequest({"mensagem": "erro"})
             conn.sendall(response)
 
+    # Para ver os dados de consumo de uma data e horário específicos:
     elif "/usuario/consumo/horario/?" in request_path:
         # Analisando a URL da solicitação para obter os parâmetros de consulta
         parametros_de_consulta = urllib.parse.parse_qs(
@@ -190,11 +200,11 @@ def receiveGet(
             data = parametros_de_consulta["data"][0]
             horario = parametros_de_consulta["horario"][0]
 
+            # Verifica se o usuário existe
             if id not in lista_usuarios.keys():
                 body_response = {"Mensagem": "Id nao encontrado"}
                 body_response = json.dumps(body_response)
                 conn.sendall(NotFound(body_response))
-                ##########################################
             else:
                 usuario = lista_usuarios[id]
                 consumo = usuario.consumo
@@ -218,6 +228,7 @@ def receiveGet(
             response = BadRequest({"mensagem": "erro"})
             conn.sendall(response)
 
+    # Para ver se há algum alerta de de grande variação:
     elif "/usuario/alerta/variacao/?" in request_path:
         # Analisando a URL da solicitação para obter os parâmetros de consulta
         parametros_de_consulta = urllib.parse.parse_qs(
@@ -227,6 +238,7 @@ def receiveGet(
             # Obtendo o valor do Query Param 'id'
             id = int(parametros_de_consulta["id"][0])
 
+            # Verifica se o usuário existe
             if id not in lista_usuarios.keys():
                 body_response = {"Mensagem": "Id nao encontrado"}
                 body_response = json.dumps(body_response)
@@ -236,7 +248,6 @@ def receiveGet(
 
                 if usuario.alerta_grande_variacao:
                     response = OK({"Alerta!!": "Sua Ultima fatura possui grande variacao"})
-                    # usuario.alerta_grande_variacao = False
                 else:
                     response = OK({"Sem alertas": "Sua Ultima fatura está na media"})
 
@@ -245,6 +256,7 @@ def receiveGet(
             response = BadRequest({"mensagem": "erro"})
             conn.sendall(response)
 
+    # Para ver se há algum alerta de consumo excessivo:
     elif "/usuario/alerta/excesso/?" in request_path:
         # Analisando a URL da solicitação para obter os parâmetros de consulta
         parametros_de_consulta = urllib.parse.parse_qs(
@@ -255,6 +267,7 @@ def receiveGet(
             id = int(parametros_de_consulta["id"][0])
             usuario = lista_usuarios[id]
 
+            # Verifica se o usuário existe
             if id not in lista_usuarios.keys():
                 body_response = {"Mensagem": "Id nao encontrado"}
                 body_response = json.dumps(body_response)
@@ -262,7 +275,6 @@ def receiveGet(
             else:
                 if usuario.alerta_consumo_excessivo:
                     response = OK({"Alerta!!": "Sua Ultima fatura possui um consumo excessivo"})
-                    # usuario.alerta_consumo_excessivo = False
                 else:
                     response = OK({"Sem alertas": "Sua Ultima fatura está na media de consumo das outras"})
 
@@ -271,13 +283,14 @@ def receiveGet(
             response = BadRequest({"mensagem": "erro"})
             conn.sendall(response)
 
-
+# Função para tratar as requisições POST
 def receivePost(
         request_path,
         body,
         conn,
         lista_usuarios,
 ):
+    # Para cadastro de usuário:
     if request_path == "/usuario/cadastro/":
         try:
             data = json.loads(body)
@@ -286,6 +299,7 @@ def receivePost(
             nome = data["nome"]
             endereco = data["endereco"]
 
+            # Verifica se o usuário existe
             if id in lista_usuarios.keys():
                 body_response = {"Mensagem": "Usuario ja cadastrado"}
                 body_response = json.dumps(body_response)
@@ -303,10 +317,11 @@ def receivePost(
             response = BadRequest({"mensagem": "erro"})
             conn.sendall(response)
 
-
+# Função para tratar as requisições DELETE
 def receiveDelete(
         request_path, conn, lista_usuarios
 ):
+    # Para exclusão de usuário:
     if "/usuario/delete/?" in request_path:
         parametros_de_consulta = urllib.parse.parse_qs(
             urllib.parse.urlparse(request_path).query
@@ -314,6 +329,8 @@ def receiveDelete(
         try:
             # Obtendo o valor do Query Param 'id'
             id = int(parametros_de_consulta["id"][0])
+
+            # Verifica se o usuário existe
             if id not in lista_usuarios.keys():
                 body_response = {"Mensagem": "Id nao encontrado"}
                 body_response = json.dumps(body_response)
@@ -331,7 +348,6 @@ def receiveDelete(
             conn.sendall(response)
 
 
-# Protocolos de resposta sem body
 # Protocolos de resposta com body em JSON
 def OK(body):
     return "HTTP/1.1 200 OK\r\n\r\n{}".format(body).encode()

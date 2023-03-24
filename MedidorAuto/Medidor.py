@@ -33,7 +33,12 @@ class SocketThread(threading.Thread):
                 date = dt.strftime("%Y-%m-%d")  # formato YYYY-MM-DD
                 hora = dt.strftime("%H:%M:%S")  # formato HH:MM:SS
 
+                # Verifica se é o dia de fechar a fatura. Se sim,
+                # medidor para por 54 segundos para não enviar mais informações,
+                # para evitar conflitos com a
+                # função "verifica_fechamento_fatura()"
                 if fct.verifica_fechamento_fatura(date, hora):
+                    # Acumulador de energia do mês zera
                     self.acumulador = 0
                     time.sleep(54)
                 else:
@@ -45,7 +50,7 @@ class SocketThread(threading.Thread):
                     print(parsed_data)
                     # Envia o pacote
                     self.sock.sendto(packet, (const.HOST, const.UDP_PORT))
-                    # Espera 5 segundos
+                    # Espera 5 segundos para enviar de novo
                     time.sleep(5)
 
             except KeyboardInterrupt:
