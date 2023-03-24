@@ -129,7 +129,7 @@ UDP_PORT = 18000
 
 #### Instruções para executar o código do medidor
 - Código automático:
-  1. Apenas executar, pois, cada imagem do container possui um id[1-3] associado ao medidor.
+  1. Apenas executar, pois, cada imagem do container possui um id[1-4] associado ao medidor.
 - Código com entrada do id do cliente e controle de consumo:
   1. Digitar o número do medidor associado ao cliente
   2. Controlar o consumo através de menu iterativo
