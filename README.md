@@ -1,5 +1,7 @@
 # Consumo de energia inteligente - Problema 1
 
+- Aluno: Lucas de Paiva Carianha
+
 Desenvolvimento de um protótipo em que os dados serão agregrados visando monitorar o consumo excessivo de energia, medir o consumo de cada cliente, gerar a fatura a ser paga, bem como alertar sobre um possível consumo excessivo de energia ou grande variação na conta de um usuário. Também, os usuários do serviço podem acessar o sistema de forma online para acompanhar o consumo de energia, com datas/horários específicos do consumo e o total acumulado.
 
 ## Produto
